@@ -1,0 +1,32 @@
+main {
+    text-align: center;
+}
+header {
+    margin: 1em auto;
+    padding: 1em;
+    text-align: center;
+    border-bottom: 1px solid;
+}
+.session {
+    width: 20vw;
+    margin: 1em auto;
+    text-align: center;
+    padding: .5em;
+    border-radius: 5px;
+    box-shadow: 4px 5px 3px;
+    border: 1px solid;
+    transition: all .2s linear;
+}
+.session:hover, .billSnippet:hover {
+    transform: scale(1.05);
+}
+.billSnippet {
+    width: 60vw;
+    margin: 1em auto;
+    padding: .5em;
+    border-radius: 5px;
+    box-shadow: 4px 4px 4px darkslategray;
+    text-align: center;
+    border: 1px solid;
+    transition: all .2s linear;
+}

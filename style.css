@@ -18,9 +18,9 @@ header {
     transition: all .2s linear;
 }
 .session:hover, .billSnippet:hover {
-    transform: scale(1.05);
+    transform: scale(1.01);
 }
-.billSnippet {
+.billSnippet, .bill {
     width: 60vw;
     margin: 1em auto;
     padding: .5em;
@@ -29,4 +29,62 @@ header {
     text-align: center;
     border: 1px solid;
     transition: all .2s linear;
+}
+.subjects {
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: 1em auto;
+    border-radius: 5px;
+    box-shadow: 4px 4px 5px;
+    padding: 1em;
+    transition: .2s all linear;
+}
+.subject {
+    border-radius: 5px;
+    border: 1px solid black;
+    margin: .5em auto;
+    transition: .25s all linear;
+    padding: .5em;
+    font-size: 80%;
+}
+.subject:hover {
+    transform: scale(1.05);
+}
+.history, .sponsors, .votes {
+    padding: .5em;
+    max-width: 80%;
+    margin: 1em auto;
+    border-radius: 5px;
+    box-shadow: 4px 4px 5px;
+    transition: .2s all linear;
+}
+.history:hover, .sponsors:hover, .votes:hover, .subjects:hover {
+    transform: scale(1.002);
+}
+.historySpan, .sponsorsSpan, .voteSpan {
+    border-bottom: 1px solid;
+    display: block;
+    min-width: fit-content;
+    max-width: 50%;
+    margin: 1em auto;
+}
+.title {
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 1em;
+}
+.description {
+    text-align: center;
+    width: 70%;
+    margin: 1em auto;
+    line-height: 1.5em;
+}
+.billDescriptor {
+    flex-basis: 100%;
+    font-weight: bold;
+    font-size: 1.2em;
 }

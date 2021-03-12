@@ -1,13 +1,17 @@
-const APIKEY = '2f39d769c57e89501bbc534f00518796';
+import {APIKEY} from './api.js';
 let OPERATION;
 let PARAMS;
 let url; 
 let billSnippets = [];
+let sessionDivs = [];
 const stateSelection = document.getElementById("states");
-stateSelection.addEventListener("change", (e) => {
-    getSessionList(e.target.value);
-    window.history.replaceState(null, null, `?state=${e.target.value}`);
-})
+Array.from(stateSelection.children).forEach(state => {
+    state.addEventListener("click", (e) => {
+        sessionDivs = [];
+        getSessionList(e.target.value);
+        window.history.pushState(null, null, `?state=${e.target.value}`);
+    })
+});
 const search = document.createElement("input");
 search.type = "text";
 search.id = "search";
@@ -21,7 +25,8 @@ search.addEventListener("change", () => {
 })
 let main = document.getElementsByTagName("main")[0];
 class Session {
-    constructor(name, id) {
+    constructor(state, name, id) {
+        this.state = state;
         this.name = name;
         this.id = id;
     }
@@ -35,6 +40,8 @@ class Session {
         name.classList += "sessionName";
 
         div.addEventListener("click", () => {
+            billSnippets = [];
+            window.history.pushState(null, null, `${window.location.search}?session=${this.name}`);
             getMasterList(this.id);
         })
         div.append(name);
@@ -55,7 +62,9 @@ class BillSnippet {
         const number = document.createElement("p");
         const title = document.createElement("p");
         const lastAction = document.createElement("p");
+        const lastActionHeader = document.createElement("p");
         const description = document.createElement("p");
+        const descriptionHeader = document.createElement("p");
 
         div.id = this.id;
         div.classList += "billSnippet";
@@ -63,16 +72,21 @@ class BillSnippet {
         number.innerText = this.number;
         title.classList += "title";
         title.innerText = this.title;
+        lastActionHeader.innerText = "Last Action";
+        lastActionHeader.classList += "billDescriptor";
         lastAction.classList += "lastAction";
         lastAction.innerText = this.lastAction;
         description.classList += "description";
         description.innerText = this.description;
+        descriptionHeader.innerText = "Description";
+        descriptionHeader.classList += "billDescriptor";
         // Show bill info
         div.addEventListener("click", () => {
+            window.history.pushState(null, null, `${window.location.search}?id=${this.id}`);
             getBillInfo(this.id, this.description);
         });
 
-        div.append(title, number, lastAction, description);
+        div.append(title, number, lastActionHeader, lastAction, descriptionHeader, description);
         return div;
     }
 }
@@ -96,7 +110,9 @@ class Bill {
     billDiv() {
         const div = document.createElement("div");
         const title = document.createElement("p");
-        const description = document.createElement("p");
+        const descriptionDiv = document.createElement("div");
+        const descriptionP = document.createElement("p");
+        const descriptionHeader = document.createElement("p");
         const session = document.createElement("p");
         const committeeName = document.createElement("p");
         const historyDiv = document.createElement("div");
@@ -108,12 +124,23 @@ class Bill {
         const votes = document.createElement("div");
         const votesP = document.createElement("p");
         const textLink = document.createElement("a");
-
+        descriptionHeader.innerText = "Description";
+        descriptionHeader.classList += "billDescriptor";
         div.classList += "bill";
         title.innerHTML = this.title;
         title.classList += "title";
-        description.innerText = this.description;
-        description.classList += "description";
+        descriptionP.innerText = this.description;
+        descriptionDiv.classList += "description";
+        descriptionDiv.append(descriptionHeader, session, descriptionP);
+        descriptionDiv.addEventListener("click", () => {
+                if (descriptionDiv.childElementCount == 1) {
+                    descriptionDiv.append(session,descriptionP);
+                } else {
+                    descriptionDiv.innerHTML = "";
+                    descriptionDiv.append(descriptionHeader);
+                }
+            })
+        
         session.innerText = this.session;
         session.classList += 'session';
         if (this.committeeName.length > 0) {
@@ -226,10 +253,12 @@ class Bill {
                 this.votesSpans.push(voteSpan);
             })
         }
-        textLink.innerText = "Click to read full text";
-        textLink.href = this.text;
-        textLink.target = "_blank";
-        div.append(title, description, session, committeeName, historyDiv, subjectDiv, sponsors, votes, textLink);
+        if (this.text.length > 0) {
+            textLink.innerText = "Click to read full text";
+            textLink.href = this.text;
+            textLink.target = "_blank";
+            }
+        div.append(title, descriptionDiv, committeeName, historyDiv, subjectDiv, sponsors, votes, textLink);
         return div;
     }
 }
@@ -246,10 +275,9 @@ function getBillInfo(id, description) {
     fetch(url)
         .then(data => data.json())
         .then(json => {
-            console.log(json);
             main.innerHTML = "";
             json = json.bill;
-            const B = new Bill(json.session["session_name"], description, json.title,json.committee,json.history,json.subjects,json.sponsors,json.votes,json.texts[0]["state_link"]);        
+            const B = new Bill(json.session["session_name"], description, json.title,json.committee,json.history,json.subjects,json.sponsors,json.votes,json.texts);        
             main.append(B.billDiv())
         })
 
@@ -265,9 +293,11 @@ function getSessionList(state) {
             // Array of objects containing session information
             let sessions = json.sessions;
             main.innerHTML = "";
-            for (session of sessions) {
-                const S = new Session(session.name, session["session_id"])
-                main.append(S.sessionDiv())
+            for (let session of sessions) {
+                const S = new Session(state, session.name, session["session_id"])
+                let div = S.sessionDiv();
+                main.append(div)
+                sessionDivs.push(div);
             }
         })
 }
@@ -287,7 +317,7 @@ function getMasterList(sessionId) {
             main.append(search);
             let bills = json.masterlist;
             delete bills.session;
-            for (key of Object.keys(bills)) {
+            for (let key of Object.keys(bills)) {
                 let billSnippet = bills[key];
                 const B = new BillSnippet(billSnippet.number, decodeHtml(billSnippet.title), billSnippet["bill_id"], decodeHtml(billSnippet["last_action"]), decodeHtml(billSnippet.description));
                 billsDiv.append(B.billSnippetDiv());
@@ -299,3 +329,35 @@ function getMasterList(sessionId) {
     })
     
 }
+
+// Back button
+const back = document.getElementById("back");
+back.addEventListener("click", () => {
+    let location = window.location.search;
+    if (location.includes("state")) {
+        if (location.includes("session")) {
+            if (location.includes("id")) {
+                //  Show bill snippets
+                let page = window.location.search.split('?');
+                window.history.pushState(null, null, `?${page[1]}?${page[2]}`);
+                main.innerHTML = "";
+                const billsDiv = document.createElement("div");
+                billsDiv.id = 'bills';
+                main.append(search, billsDiv);
+                billSnippets.forEach(b => {
+                    billsDiv.append(b.billSnippetDiv());
+                })
+            } else {
+                // show session list
+                let page = window.location.search.split('?');
+                window.history.pushState(null, null, `?${page[1]}`);
+                main.innerHTML = "";
+                sessionDivs.forEach(s => {
+                    main.append(s);
+                })
+            }
+        } else {
+           window.location.href = "index.html";
+        }
+    }
+})

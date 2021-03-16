@@ -1,0 +1,161 @@
+main {
+    text-align: center;
+    min-height: 100vh;
+}
+header {
+    background-color: #51344D;
+    margin: 1em auto;
+    padding: 1em;
+    text-align: center;
+    border-bottom: 1px solid;
+    box-shadow: 4px 4px 4px;
+}
+h2 {
+    border-radius: 5px;
+    box-shadow: 4px 4px 15px;
+    margin: 1em auto;
+    width: fit-content;
+    padding: .5em;
+}
+.session {
+    min-width: 20vw;
+    max-width: 35%;
+    margin: 1em auto;
+    text-align: center;
+    padding: .5em;
+    border-radius: 5px;
+    box-shadow: 4px 5px 3px;
+    border: 1px solid;
+    transition: all .2s linear;
+}
+.session:hover, .billSnippet:hover {
+    transform: scale(1.02);
+}
+.billSnippet, .bill {
+    width: 50vw;
+    margin: 1em auto;
+    padding: .5em;
+    border-radius: 5px;
+    box-shadow: 4px 4px 4px darkslategray;
+    text-align: center;
+    border: 1px solid;
+    transition: all .2s linear;
+}
+.subjects {
+    display: flex;
+    flex-wrap: wrap;
+    width: 70%;
+    margin: 1em auto;
+    border-radius: 5px;
+    box-shadow: 4px 4px 5px;
+    padding: .5em;
+    transition: .2s all linear;
+}
+.subject {
+    border-radius: 5px;
+    border: 1px solid black;
+    margin: .5em auto;
+    transition: .25s all linear;
+    padding: .5em;
+    font-size: 80%;
+}
+.subject:hover {
+    transform: scale(1.05);
+}
+.history, .sponsors, .votes, .description {
+    padding: .5em;
+    max-width: 70%;
+    margin: 1em auto;
+    border-radius: 5px;
+    box-shadow: 4px 4px 5px;
+    transition: .2s all linear;
+}
+.sponsors {
+    display: flex;
+    flex-wrap: wrap;
+}
+.history:hover, .sponsors:hover, .votes:hover, .subjects:hover {
+    transform: scale(1.005);
+}
+.historySpan, .sponsorsSpan, .voteSpan {
+    border-bottom: 1px solid;
+    display: block;
+    min-width: fit-content;
+    max-width: 50%;
+    margin: 1em auto;
+}
+.lastAction{
+    text-align: center;
+    padding: 1em;
+    width: 70%;
+    margin: 0 auto;
+    border-radius: 5px;
+    box-shadow: 5px 4px 4px;
+}
+.title {
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 1em;
+}
+
+.billDescriptor {
+    flex-basis: 100%;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+footer {
+    box-shadow: -2px -1px 4px gray;
+    background: black;
+    color: white;
+    padding: 1em;
+    text-align: center;
+    width: -webkit-fill-available;
+    margin-top: 5em;
+    position: relative;
+    top: 0;
+}
+footer a {
+    color: white;
+}
+a {
+    color: black;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+main button {
+    width: fit-content;
+    margin: 1em;
+    padding: 1em;
+}
+#states {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 1em;
+    padding: 1em 3em;
+    box-shadow: 5px 4px 10px darkgray;
+}
+button {
+    padding: .5em;
+    border-radius: 3px;
+    border: 1px solid;
+    transition: .25s all linear;
+    box-shadow: 3px 3px 5px black;
+}
+button:hover {
+    color: white;
+    background: black;
+    border: 1px solid pink;
+    border-radius: 5px;
+}
+button:active {
+    color: white;
+    background: black;
+    border: 1px solid white;
+    box-shadow: 3px 3px 3px silver;
+}

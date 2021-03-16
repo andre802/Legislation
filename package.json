@@ -1,0 +1,23 @@
+{
+  "name": "legislation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andre802/Legislation.git"
+  },
+  "author": "Justin Reeves",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andre802/Legislation/issues"
+  },
+  "homepage": "https://github.com/andre802/Legislation#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node": "^15.10.0"
+  }
+}

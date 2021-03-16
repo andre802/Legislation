@@ -1,9 +1,10 @@
-import {APIKEY} from './api.js';
+import { APIKEY } from './api.js';
 let OPERATION;
 let PARAMS;
-let url; 
+let url;
 let billSnippets = [];
 let sessionDivs = [];
+let main = document.getElementsByTagName("main")[0];
 const stateSelection = document.getElementById("states");
 Array.from(stateSelection.children).forEach(state => {
     state.addEventListener("click", (e) => {
@@ -23,7 +24,15 @@ search.addEventListener("change", () => {
         document.getElementById("bills").append(b.billSnippetDiv());
     })
 })
-let main = document.getElementsByTagName("main")[0];
+const filters = document.createElement("div");
+filters.id = "filters";
+const filterByDate = document.createElement("span");
+filterByDate.innerHTML = "<label for='filterDate'>Filter by Date of Last Action: </label><select id='filterDate'><option value='recent'>Recent</option><option value='latest'>Latest</option></select>"
+const filterByStatus = document.createElement("span");
+filterByStatus.innerHTML = "<label for='filterStatus'>Filter by Status of Bill: </label><select id='filterStatus'><option value='Introduced'>Introduced</option><option value='Engrossed'>Engrossed</option><option value='Enrolled'>Enrolled</option><option value='Passed'>Passed</option><option value='Vetoed'>Vetoed</option><option value='Failed'>Failed</option></select>";
+filters.append(filterByDate, filterByStatus);
+
+
 class Session {
     constructor(state, name, id) {
         this.state = state;
@@ -33,7 +42,7 @@ class Session {
     sessionDiv() {
         const div = document.createElement("div");
         const name = document.createElement("p");
-        
+
         div.id = this.id;
         div.classList += "session";
         name.innerText = this.name;
@@ -45,17 +54,19 @@ class Session {
             getMasterList(this.id);
         })
         div.append(name);
-        return div;  
+        return div;
 
     }
 }
 class BillSnippet {
-    constructor(number, title, id, lastAction, description) {
+    constructor(number, title, id, lastAction, lastActionDate, description, status) {
         this.number = number;
         this.title = title;
         this.id = id;
         this.lastAction = lastAction;
         this.description = description;
+        this.status = parseStatus(status);
+        this.lastActionDate = lastActionDate;
     }
     billSnippetDiv() {
         const div = document.createElement("div");
@@ -63,8 +74,10 @@ class BillSnippet {
         const title = document.createElement("p");
         const lastAction = document.createElement("p");
         const lastActionHeader = document.createElement("p");
+        const lastActionDate = document.createElement("p");
         const description = document.createElement("p");
         const descriptionHeader = document.createElement("p");
+        const statusP = document.createElement("p");
 
         div.id = this.id;
         div.classList += "billSnippet";
@@ -75,23 +88,25 @@ class BillSnippet {
         lastActionHeader.innerText = "Last Action";
         lastActionHeader.classList += "billDescriptor";
         lastAction.classList += "lastAction";
+        lastActionDate.innerText = `Date of last action: ${this.lastActionDate}`;
         lastAction.innerText = this.lastAction;
         description.classList += "description";
         description.innerText = this.description;
         descriptionHeader.innerText = "Description";
         descriptionHeader.classList += "billDescriptor";
+        statusP.innerText = this.status;
         // Show bill info
         div.addEventListener("click", () => {
             window.history.pushState(null, null, `${window.location.search}?id=${this.id}`);
             getBillInfo(this.id, this.description);
         });
 
-        div.append(title, number, lastActionHeader, lastAction, descriptionHeader, description);
+        div.append(title, number, lastActionHeader, lastAction, lastActionDate, descriptionHeader, statusP, description);
         return div;
     }
 }
 class Bill {
-    constructor(session, description, title, committeeName, history, subject, sponsors, votes, text) {
+    constructor(session, description, title, committeeName, history, subject, sponsors, votes, text, status, lastActionDate) {
         this.session = session;
         this.description = description;
         this.title = title;
@@ -101,6 +116,8 @@ class Bill {
         this.sponsors = sponsors;
         this.votes = votes;
         this.text = text;
+        this.status = parseStatus(status);
+        this.lastActionDate = lastActionDate;
 
         this.historySpans = [];
         this.votesSpans = []
@@ -112,6 +129,8 @@ class Bill {
         const title = document.createElement("p");
         const descriptionDiv = document.createElement("div");
         const descriptionP = document.createElement("p");
+        const statusP = document.createElement("p");
+        const lastActionDate = document.createElement("p");
         const descriptionHeader = document.createElement("p");
         const session = document.createElement("p");
         const committeeName = document.createElement("p");
@@ -124,23 +143,26 @@ class Bill {
         const votes = document.createElement("div");
         const votesP = document.createElement("p");
         const textLink = document.createElement("a");
+
         descriptionHeader.innerText = "Description";
         descriptionHeader.classList += "billDescriptor";
+        statusP.innerText = this.status;
         div.classList += "bill";
         title.innerHTML = this.title;
         title.classList += "title";
         descriptionP.innerText = this.description;
         descriptionDiv.classList += "description";
-        descriptionDiv.append(descriptionHeader, session, descriptionP);
+        lastActionDate.innerText = `Date of last action: ${this.lastActionDate}`;
+        descriptionDiv.append(descriptionHeader, session, statusP, lastActionDate, descriptionP);
         descriptionDiv.addEventListener("click", () => {
-                if (descriptionDiv.childElementCount == 1) {
-                    descriptionDiv.append(session,descriptionP);
-                } else {
-                    descriptionDiv.innerHTML = "";
-                    descriptionDiv.append(descriptionHeader);
-                }
-            })
-        
+            if (descriptionDiv.childElementCount == 1) {
+                descriptionDiv.append(session, statusP, descriptionP);
+            } else {
+                descriptionDiv.innerHTML = "";
+                descriptionDiv.append(descriptionHeader);
+            }
+        })
+
         session.innerText = this.session;
         session.classList += 'session';
         if (this.committeeName.length > 0) {
@@ -151,15 +173,15 @@ class Bill {
         historyP.classList += "billDescriptor";
         historyDiv.append(historyP);
         historyDiv.addEventListener("click", () => {
-                if (historyDiv.childElementCount == 1) {
-                    this.historySpans.forEach(h => {
-                        historyDiv.append(h);
-                    })
-                } else {
-                    historyDiv.innerHTML = "";
-                    historyDiv.append(historyP);
-                }
-            })
+            if (historyDiv.childElementCount == 1) {
+                this.historySpans.forEach(h => {
+                    historyDiv.append(h);
+                })
+            } else {
+                historyDiv.innerHTML = "";
+                historyDiv.append(historyP);
+            }
+        })
         this.history.forEach(h => {
             let historySpan = document.createElement("span");
             let action = document.createElement("p");
@@ -199,15 +221,15 @@ class Bill {
         sponsorsP.classList += "billDescriptor";
         sponsors.append(sponsorsP);
         sponsors.addEventListener("click", () => {
-                if (sponsors.childElementCount == 1) {
-                    this.sponsorsSpans.forEach(s => {
-                        sponsors.append(s);
-                    })
-                } else {
-                    sponsors.innerHTML = "";
-                    sponsors.append(sponsorsP);
-                }
-            })
+            if (sponsors.childElementCount == 1) {
+                this.sponsorsSpans.forEach(s => {
+                    sponsors.append(s);
+                })
+            } else {
+                sponsors.innerHTML = "";
+                sponsors.append(sponsorsP);
+            }
+        })
         this.sponsors.forEach(s => {
             let sponsorsSpan = document.createElement("span");
             let name = document.createElement("p");
@@ -257,9 +279,28 @@ class Bill {
             textLink.innerText = "Click to read full text";
             textLink.href = this.text;
             textLink.target = "_blank";
-            }
+        }
         div.append(title, descriptionDiv, committeeName, historyDiv, subjectDiv, sponsors, votes, textLink);
         return div;
+    }
+}
+function parseStatus(status) {
+    if (typeof (status) == "number") {
+        status = String(status);
+    }
+    switch (status) {
+        case "1":
+            return "Introduced";
+        case "2":
+            return "Engrossed";
+        case "3":
+            return "Enrolled";
+        case "4":
+            return "Passed";
+        case "5":
+            return "Vetoed";
+        case "6":
+            return "Failed";
     }
 }
 function decodeHtml(html) {
@@ -277,7 +318,7 @@ function getBillInfo(id, description) {
         .then(json => {
             main.innerHTML = "";
             json = json.bill;
-            const B = new Bill(json.session["session_name"], description, json.title,json.committee,json.history,json.subjects,json.sponsors,json.votes,json.texts);        
+            const B = new Bill(json.session["session_name"], description, json.title, json.committee, json.history, json.subjects, json.sponsors, json.votes, json.texts, json.status, json["status_date"]);
             main.append(B.billDiv())
         })
 
@@ -315,21 +356,49 @@ function getMasterList(sessionId) {
         .then(json => {
             main.innerHTML = "";
             main.append(search);
+            main.append(filters);
+            appendEventListeners()
             let bills = json.masterlist;
             delete bills.session;
             for (let key of Object.keys(bills)) {
                 let billSnippet = bills[key];
-                const B = new BillSnippet(billSnippet.number, decodeHtml(billSnippet.title), billSnippet["bill_id"], decodeHtml(billSnippet["last_action"]), decodeHtml(billSnippet.description));
+                const B = new BillSnippet(billSnippet.number, decodeHtml(billSnippet.title), billSnippet["bill_id"], decodeHtml(billSnippet["last_action"]), billSnippet["last_action_date"], decodeHtml(billSnippet.description), billSnippet.status);
                 billsDiv.append(B.billSnippetDiv());
                 billSnippets.push(B);
             }
         }
-    ).finally(() => {
-        main.append(billsDiv);
-    })
-    
-}
+        ).finally(() => {
+            main.append(billsDiv);
+        })
 
+}
+function appendEventListeners() {
+    document.getElementById("filterStatus").addEventListener("change", (e) => {
+        const filtered = billSnippets.filter(billSnippet => {
+            return billSnippet.status == e.target.value;
+        })
+        document.getElementById("bills").innerHTML = "";
+        filtered.forEach((b) => {
+            document.getElementById("bills").append(b.billSnippetDiv());
+        })
+    })
+    document.getElementById("filterDate").addEventListener("change", (e) => {
+        const sorted = billSnippets.sort((b1, b2) => {
+            let date1 = new Date(`${b1.lastActionDate}T00:00:00`);
+            let date2 = new Date(`${b2.lastActionDate}T00:00:00`);
+            if (date1 < date2) { return -1 }
+            if (date1 > date2) { return 1 };
+            return 0;
+        })
+        document.getElementById("bills").innerHTML = "";
+        if (e.target.value = 'latest') {
+            sorted.reverse();
+        }
+        sorted.forEach((b) => {
+            document.getElementById("bills").append(b.billSnippetDiv());
+        })
+    })
+}
 // Back button
 const back = document.getElementById("back");
 back.addEventListener("click", () => {
@@ -343,7 +412,8 @@ back.addEventListener("click", () => {
                 main.innerHTML = "";
                 const billsDiv = document.createElement("div");
                 billsDiv.id = 'bills';
-                main.append(search, billsDiv);
+                main.append(search, filters,billsDiv);
+                appendEventListeners()
                 billSnippets.forEach(b => {
                     billsDiv.append(b.billSnippetDiv());
                 })
@@ -357,7 +427,7 @@ back.addEventListener("click", () => {
                 })
             }
         } else {
-           window.location.href = "index.html";
+            window.location.href = "index.html";
         }
     }
 })

@@ -10,6 +10,12 @@ header {
     border-bottom: 1px solid;
     box-shadow: 4px 4px 4px;
 }
+#filters {
+    padding: 1em;
+}
+label {
+    padding: 1em;
+}
 h2 {
     border-radius: 5px;
     box-shadow: 4px 4px 15px;

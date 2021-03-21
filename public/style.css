@@ -10,8 +10,22 @@ header {
     border-bottom: 1px solid;
     box-shadow: 4px 4px 4px;
 }
+header h1 {
+    color: white;
+}
 #filters {
     padding: 1em;
+    margin: 1em auto;
+    width: 50%;
+    box-shadow: 2px 1px 5px 2px silver;
+}
+#filters span {
+    display: block;
+    margin: 1em 0;
+}
+#filters button {
+    padding: .5em;
+    margin: 0 auto;
 }
 label {
     padding: 1em;
@@ -38,13 +52,14 @@ h2 {
     transform: scale(1.02);
 }
 .billSnippet, .bill {
-    width: 50vw;
+    min-width: 20em;
+    max-width: 60%;
     margin: 1em auto;
     padding: .5em;
     border-radius: 5px;
-    box-shadow: 4px 4px 4px darkslategray;
+    box-shadow: 4px 4px 4px black;
     text-align: center;
-    border: 1px solid;
+    border: 1px solid silver;
     transition: all .2s linear;
 }
 .subjects {
@@ -105,6 +120,7 @@ h2 {
     width: fit-content;
     margin: 0 auto;
     padding: 1em;
+    font-size: 1.5em;
 }
 
 .billDescriptor {

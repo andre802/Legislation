@@ -30,7 +30,15 @@ const filterByDate = document.createElement("span");
 filterByDate.innerHTML = "<label for='filterDate'>Filter by Date of Last Action: </label><select id='filterDate'><option value='recent'>Recent</option><option value='latest'>Latest</option></select>"
 const filterByStatus = document.createElement("span");
 filterByStatus.innerHTML = "<label for='filterStatus'>Filter by Status of Bill: </label><select id='filterStatus'><option value='Introduced'>Introduced</option><option value='Engrossed'>Engrossed</option><option value='Enrolled'>Enrolled</option><option value='Passed'>Passed</option><option value='Vetoed'>Vetoed</option><option value='Failed'>Failed</option></select>";
-filters.append(filterByDate, filterByStatus);
+const reset = document.createElement("button");
+reset.innerText = "Reset";
+reset.addEventListener("click", () => {
+    document.getElementById("bills").innerHTML = "";
+    billSnippets.forEach(b =>{
+        document.getElementById("bills").append(b.billSnippetDiv());
+    })
+})
+filters.append(filterByDate, filterByStatus, reset);
 
 
 class Session {
@@ -72,9 +80,11 @@ class BillSnippet {
         const div = document.createElement("div");
         const number = document.createElement("p");
         const title = document.createElement("p");
+        const lastActionDiv = document.createElement("div");
         const lastAction = document.createElement("p");
         const lastActionHeader = document.createElement("p");
         const lastActionDate = document.createElement("p");
+        const descriptionDiv = document.createElement("div");
         const description = document.createElement("p");
         const descriptionHeader = document.createElement("p");
         const statusP = document.createElement("p");
@@ -87,10 +97,10 @@ class BillSnippet {
         title.innerText = this.title;
         lastActionHeader.innerText = "Last Action";
         lastActionHeader.classList += "billDescriptor";
-        lastAction.classList += "lastAction";
-        lastActionDate.innerText = `Date of last action: ${this.lastActionDate}`;
+        lastActionDiv.classList += "lastAction";
+        lastActionDate.innerText = this.lastActionDate;
         lastAction.innerText = this.lastAction;
-        description.classList += "description";
+        descriptionDiv.classList += "description";
         description.innerText = this.description;
         descriptionHeader.innerText = "Description";
         descriptionHeader.classList += "billDescriptor";
@@ -100,8 +110,9 @@ class BillSnippet {
             window.history.pushState(null, null, `${window.location.search}?id=${this.id}`);
             getBillInfo(this.id, this.description);
         });
-
-        div.append(title, number, lastActionHeader, lastAction, lastActionDate, descriptionHeader, statusP, description);
+        lastActionDiv.append(lastActionHeader, lastAction, lastActionDate);
+        descriptionDiv.append(descriptionHeader, descriptionHeader, description, statusP);
+        div.append(title, lastActionDiv, descriptionDiv);
         return div;
     }
 }
@@ -156,7 +167,7 @@ class Bill {
         descriptionDiv.append(descriptionHeader, session, statusP, lastActionDate, descriptionP);
         descriptionDiv.addEventListener("click", () => {
             if (descriptionDiv.childElementCount == 1) {
-                descriptionDiv.append(session, statusP, descriptionP);
+                descriptionDiv.append(session, statusP, lastActionDate, descriptionP);
             } else {
                 descriptionDiv.innerHTML = "";
                 descriptionDiv.append(descriptionHeader);
@@ -374,6 +385,7 @@ function getMasterList(sessionId) {
 }
 function appendEventListeners() {
     document.getElementById("filterStatus").addEventListener("change", (e) => {
+        document.getElementById("bills").innerHTML = "Loading";
         const filtered = billSnippets.filter(billSnippet => {
             return billSnippet.status == e.target.value;
         })
@@ -383,6 +395,7 @@ function appendEventListeners() {
         })
     })
     document.getElementById("filterDate").addEventListener("change", (e) => {
+        document.getElementById("bills").innerHTML = "Loading";
         const sorted = billSnippets.sort((b1, b2) => {
             let date1 = new Date(`${b1.lastActionDate}T00:00:00`);
             let date2 = new Date(`${b2.lastActionDate}T00:00:00`);

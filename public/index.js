@@ -1,4 +1,4 @@
-import { APIKEY } from './api.js';
+const APIKEY = process.env.API;
 let OPERATION;
 let PARAMS;
 let url;
@@ -42,11 +42,22 @@ filters.append(filterByDate, filterByStatus, reset);
 
 
 class Session {
+    /**
+     * 
+     * @param {String} state - name of the state the session was conducted in
+     * @param {String} name - name of the session
+     * @param {String} id - id of the session used to retrieve bill details
+     */
     constructor(state, name, id) {
         this.state = state;
         this.name = name;
         this.id = id;
     }
+    /**
+     * 
+     * @returns HTMLDivElement - containing name of the element. Clicking
+     * on the div displays the bills considered in the session.
+     */
     sessionDiv() {
         const div = document.createElement("div");
         const name = document.createElement("p");

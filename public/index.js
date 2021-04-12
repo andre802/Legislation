@@ -1,4 +1,4 @@
-const APIKEY = process.env.API;
+import {APIKEY} from './api.js';
 let OPERATION;
 let PARAMS;
 let url;

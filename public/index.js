@@ -1,4 +1,4 @@
-
+import {APIKEY} from "./app";
 const APIKEY = env.KEY;
 let OPERATION;
 let PARAMS;

@@ -1,4 +1,4 @@
-import {APIKEY} from "./app.js";
+const {APIKEY} = require('./app.js');
 let OPERATION;
 let PARAMS;
 let url;

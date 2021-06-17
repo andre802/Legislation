@@ -1,4 +1,4 @@
-import {APIKEY} from "./app";
+import {APIKEY} from "./app.js";
 let OPERATION;
 let PARAMS;
 let url;
